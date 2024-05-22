@@ -1,0 +1,583 @@
+{{define "addTask"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="./styles/style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style>
+    /* Styles for the fancy delete button */
+    .delete-button {
+      background-color: #ff4d4d;
+      /* Red color for delete button */
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .delete-button:hover {
+      background-color: #cc0000;
+      /* Darker red color on hover */
+    }
+
+    /* Style for the trash icon */
+    .delete-button::before {
+      font-family: "Font Awesome 5 Free";
+      /* Font Awesome for the icon */
+      font-weight: 900;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.3s ease;
+    }
+
+    .delete-button:hover::before {
+      transform: translate(-50%, -50%) scale(1.2);
+      /* Scale up the icon on hover */
+    }
+
+
+    h1 {
+      color: rgb(19, 106, 227);
+      font-size: 45px;
+      text-align: center;
+      text-decoration: underline;
+    }
+
+    h2 {
+      color: rgb(16, 50, 97);
+      font-size: 30px;
+      text-align: center;
+      text-decoration: underline;
+    }
+
+    h3 {
+      color: rgb(0, 87, 33);
+      font-size: 30px;
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    p {
+      color: rgb(0, 1, 1);
+      font-size: 30px;
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    body {
+      font-family: Arial;
+      color: white;
+    }
+
+    tr {
+      align-items: center;
+    }
+
+    .split {
+      height: 100%;
+      width: 50%;
+      position: fixed;
+      z-index: 1;
+      top: 5;
+      overflow-x: hidden;
+      padding-top: 10px;
+    }
+
+    .left {
+      left: 0;
+      background-color: rgb(215, 243, 250);
+    }
+
+    .right {
+      right: 0;
+      background-color: rgb(225, 225, 225);
+    }
+
+    .centered {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .centered img {
+      width: 150px;
+      border-radius: 50%;
+    }
+
+    .col-25 {
+      width: 25%;
+      float: left;
+      margin-top: 6px;
+      margin-right: 30px;
+      padding-left: 10px;
+    }
+
+    .col-75 {
+      width: 35%;
+      float: left;
+      margin-top: 10px;
+      margin-left: 50p;
+    }
+
+    input[type=text] {
+      width: 25%;
+    }
+
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .label {
+      margin-left: 25px;
+      /* Adjust as needed */
+      margin-right: 10px;
+      font-size: 20px;
+      color: black;
+    }
+
+    .label_1 {
+      color: black;
+      font-size: 20px;
+      align-items: center;
+      margin-left: 30px;;
+    }
+
+    .submit-button {
+      margin-left: 25px;
+      /* Adjust as needed */
+
+      background-color: #4CAF50;
+      /* Green */
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .submit-button:hover {
+      background-color: #45a049;
+      /* Darker Green */
+    }
+
+
+
+    .container {
+      margin-left: 25px;
+      /* Adjust as needed */
+      margin-right: 10px;
+      display: flex;
+      justify-content: flex-start;
+      /* Align items to the top of the container */
+      align-items: flex-start;
+      height: 100vh;
+      margin-top: 20px;
+      margin-right: 50px;
+      margin-bottom: 0px;
+    }
+
+    .fancy-label {
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      color: #333;
+      background-color: #f9f9f9;
+      padding: 10px 10px;
+      border-radius: 10px 0 0 10px;
+    }
+
+    .fancy-input {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+      padding: 10px;
+      border: 2px solid #ccc;
+      border-radius: 0 10px 10px 0;
+      outline: none;
+    }
+
+    .fancy-input:focus {
+      border-color: #007bff;
+    }
+
+    /* Button Styles */
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .delete-button {
+      margin-left: 30px;
+      background-color: #b00c00;
+      color: white;
+    }
+
+    .delete-button:hover {
+      background-color: #d83c2a;
+    }
+
+    /* .pending-button {
+      background-color: #4CAF50;
+    }
+
+
+    .pending-button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    } */
+
+    .complete-button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    button.pending {
+      background-color: #36005c;
+      color: white;
+    }
+
+    button.completed {
+      background-color: #808080;
+      /* Gray */
+      color: white;
+    }
+
+    .complete-button {
+      background-color: #808080;
+      /* Green */
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .complete-button:hover {
+      background-color: #6e458c;
+      /* Darker Green */
+    }
+
+    .split {
+      width: 50%;
+      float: left;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .error-message {
+      color: red;
+      font-style: italic;
+    }
+
+    .completed-button {
+      background-color: rgb(255, 255, 255);
+      color: white;
+    }
+
+    .pending-button {
+      background-color: yellow;
+      /* Change the color for pending items */
+      color: black;
+      /* Change the text color for pending items */
+    }
+  </style>
+</head>
+
+<body>
+  <h1>TASK MANAGEMENT SYSTEM</h1>
+  <!-- <div class="split left">
+    <form method="POST">
+      <h2>Task Entry Form</h2>
+      <label for="textbox" class="label">TaskName: </label>
+      <input type="text" name="taskname" /><br /><br />
+      <label for="textbox" class="label">DeadLine:</label>
+      <input type="datetime-local" name="deadline" /><br /><br /><br />
+      <button type="submit" class="submit-button">Submit</button>
+    </form>
+  </div> -->
+  <div class="split left">
+    <form id="task-form" method="POST" onsubmit="return validateForm()">
+      <h2>Task Entry Form</h2>
+      <label for="textbox" class="label">TaskName: </label>
+      <input type="text" name="taskname" id="taskname" /><br />
+      <span class="error-message" id="taskname-error"></span><br />
+      <label for="textbox" class="label">DeadLine:</label>
+      <input type="datetime-local" name="deadline" id="deadline" min="2024-05-21T23:59">      /><br /><br />
+      <span class="error-message" id="deadline-error"></span><br />
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  <!-- <div class="split left">
+    <form id="task-form" method="POST" onsubmit="return validateForm()">
+        <h2>Task Entry Form</h2>
+        <label for="textbox" class="label">TaskName: </label>
+        <input type="text" name="taskname" id="taskname" /><br />
+        <span class="error-message" id="taskname-error"></span><br />
+        <label for="textbox" class="label">DeadLine:</label>
+        <input type="datetime-local" name="deadline" id="deadline" /><br /><br />
+        <span class="error-message" id="taskname-error"></span><br />
+        <button type="submit">Submit</button>
+    </form>
+</div> -->
+  <div class="split right">
+    <table>
+      <h2>List of All Tasks</h2>
+      <tr>
+        <th><label for="textbox" class="label">TaskName</label> </th>
+        <th> <label for="textbox" class="label">DeadLine</label> </th>
+        <th> <label for="textbox" class="label_1">Actions</label> </th>
+      </tr>
+      {{range $singleItem := .data}}
+      <tr>
+        <td>
+          <p style="font-size: 20px;" id="field1">{{$singleItem.TaskName}}</p>
+        </td>
+        <td>
+          <p style="font-size: 20px;" id="field2">{{$singleItem.DeadlineUnix}}</p>
+        </td>
+        <td>
+          <form action="/delete" method="get">
+            <input type="hidden" name="id" value="{{$singleItem.Id}}">
+            <button type="submit" class="delete-button">Delete</button>
+          </form>
+        </td>
+        <!-- <td>
+          <form action="/complete" method="get">
+              <input type="hidden" name="id" value="{{$singleItem.Id}}">
+              <button>
+                  {{$buttonText := "Pending"}}
+                  {{if $singleItem.Completed}}
+                      {{$buttonText = "Completed"}}
+                  {{end}}
+                  {{$buttonText}}
+              </button>
+          </form>
+      </td>
+       -->
+
+        <!-- <td>
+          <form action="/complete" method="get">
+            <input type="hidden" name="id" value="{{$singleItem.Id}}">
+            <button>Pending</button>
+          </form>
+        </td> -->
+
+        <!-- <td>
+          <form action="/complete" method="get">
+              <input type="hidden" name="id" value="{{$singleItem.Id}}">
+              <button type="button" onclick="changeButtonText(this)">Pending</button>
+          </form>
+      </td> -->
+        <!-- <td>
+        <form action="/complete" method="get" id="completeForm{{$singleItem.Id}}">
+            <input type="hidden" name="id" value="{{$singleItem.Id}}">
+            <button onclick="changeButtonText(event)">Pending</button>
+        </form>
+    </td> -->
+        <!-- <td>
+      <form action="/complete" method="get" id="completeForm{{$singleItem.Id}}">
+          <input type="hidden" name="id" value="{{$singleItem.Id}}">
+          <button onclick="changeButtonText(event)">Pending</button>
+      </form>
+  </td>
+    <td>
+      <button onclick="changeButtonText(event)">Pending</button>
+  </td> -->
+
+        <!-- <td>
+          <form id="completeForm{{$singleItem.Id}}">
+            <input type="hidden" name="id" value="{{$singleItem.Id}}">
+            <button class="complete-button">
+              {{$buttonText := "Pending"}}
+              {{if $singleItem.Completed}}
+                  {{$buttonText = "Completed"}}
+              {{end}}
+              {{$buttonText}}
+            </button>
+          </form>
+        </td> -->
+
+        <td>
+          <form id="completeForm{{$singleItem.Id}}">
+            <input type="hidden" name="id" value="{{$singleItem.Id}}">
+            <!-- <button class="complete-button" style="background-color:color"> -->
+            <button class="complete-button" data-completed="{{$singleItem.Completed}}">
+              {{$buttonText := "Pending"}}
+              {{if $singleItem.Completed}}
+              {{$buttonText = "Completed"}}
+              {{end}}
+              {{$buttonText}}
+            </button>
+          </form>
+        </td>
+
+      </tr>
+      {{end}}
+    </table>
+  </div>
+  <script>
+    //   $(document).ready(function() {
+    //     $(".complete-button").each(function() {
+    //         var completed = $(this).data("completed");
+    //         if (completed) {
+    //             $(this).addClass("completed");
+    //         } else {
+    //             $(this).addClass("pending");
+    //         }
+    //     });
+    // });
+
+    function changeButtonText(event) {
+      var button = event.target;
+      var form = button.parentElement; // Get the parent form element
+      button.innerText = "Completed"; // Change button text
+      button.setAttribute("disabled", "true"); // Disable the button
+      // /  form.submit(); // Submit the form if needed
+    }
+
+    $(document).ready(function() {
+      // Fetch data from the server
+      $.ajax({
+        url: '/addTask', 
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+          response.data.forEach(function(item) {
+            item.DeadlineDate = new Date(item.DeadlineUnix);
+          });
+
+          response.data.sort(function(a, b) {
+            return a.DeadlineDate - b.DeadlineDate;
+          });
+
+          response.data.forEach(function(item) {
+            $('#taskTable').append('<tr><td><p style="font-size: 20px;">' + item.TaskName + '</p></td><td><p style="font-size: 20px;">' + item.DeadlineUnix + '</p></td></tr>');
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr.responseText);
+        }
+      });
+    });
+
+
+    $(document).ready(function () {
+      $('.complete-button').on('click', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var form = $(this).closest('form');
+        var taskId = form.find('input[name="id"]').val();
+
+        // Send an AJAX request to mark the task as completed
+        $.ajax({
+          type: 'GET',
+          url: '/complete',
+          data: { id: taskId },
+          success: function (response) {
+          form.find('button').text('Completed');
+          },
+          error: function (xhr, status, error) {
+            console.error('AJAX request failed:', error);
+          }
+        });
+      });
+    });
+
+
+    //     $(document).ready(function(){
+    //     // Add click event listener to the button
+    //     $('.complete-button').click(function(){
+    //         $(this).css("background-color", "#ff6200"); 
+    //       });
+    // });
+
+    // function changeButtonText(event) {
+    //     //Prevent form submission
+    //     //event.preventDefault();
+
+    //     // Change the button text
+    //     var button = event.target;
+    //     button.innerText = "Completed";
+    //     button.setAttribute("disabled", "true");
+    //     // Submit the form after changing the button text
+    //     //var form = button.parentNode;
+    //     //form.submit();
+    // }
+
+    // function changeButtonText(event) {
+    //     var button = event.target;
+    //     button.innerText = "Completed";
+    //     button.setAttribute("disabled", "true"); // Optionally, disable the button after clicking
+    // }
+
+
+
+    function validateForm() {
+      var taskName = document.getElementById('taskname').value;
+      var deadline = document.getElementById('deadline').value;
+      var taskNameError = document.getElementById('taskname-error');
+      var deadlineError = document.getElementById('deadline-error');
+
+      // Reset error messages
+      taskNameError.textContent = '';
+      deadlineError.textContent = '';
+
+      // Check if taskName or deadline is blank
+      if (taskName.trim() === '') {
+        taskNameError.textContent = 'Please enter task name';
+        return false; // Prevent form submission
+      }
+
+      if (deadline.trim() === '') {
+        deadlineError.textContent = 'Please enter deadline';
+        return false; // Prevent form submission
+      }
+
+      return true; // Allow form submission if all fields are filled
+    }
+  </script>
+</body>
+
+</html>
+{{end}}
